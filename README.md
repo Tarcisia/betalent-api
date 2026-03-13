@@ -40,33 +40,28 @@ A API permite:
 
 A aplicação foi estruturada seguindo boas práticas de separação de responsabilidades.
 
----
 
-## Estrutura principal
-
-```text
 app/
-├── Http/
-│ ├── Controllers → controle das rotas da API
-│ ├── Requests → validação de dados
-│ └── Resources → formatação das respostas
-├── Models → entidades do sistema
-└── Services
-├── Payment → lógica de pagamento e orquestração
-└── Payment/Gateways → integração com APIs externas
-```
+ ├── Http/Controllers → controle das rotas da API
+ ├── Services → regras de negócio
+ │     └── Payment → lógica de pagamento e orquestração
+ │          └── Gateways → integração com APIs externas
+ ├── Models → entidades do sistema
+ ├── Http/Requests → validação de dados
+ └── Http/Resources → formatação das respostas
 
----
-
-## Fluxo de pagamento
 
 A lógica de pagamento utiliza um **orquestrador de gateways**, que tenta processar a cobrança respeitando a prioridade definida.
 
-```text
-API → PaymentOrchestrator → Gateway 1
-↳ falha → Gateway 2
-↳ sucesso → transação registrada
-```
+Fluxo:
+
+
+API → PaymentOrchestrator → Gateway1
+↓ erro
+Gateway2
+↓ sucesso
+Transação registrada
+
 
 ---
 
@@ -300,49 +295,29 @@ Body:
     "cvv": "010"
   }
 }
-'''
 
 ---
 
-# Fluxo de fallback de gateways
+## Fluxo de fallback de gateways
 
-Busca gateways ativos ordenados por prioridade
+ 1. Busca gateways ativos ordenados por prioridade 
+ 2. Tenta gateway 1
+ 3. Se falhar → tenta gateway 2
+ 4. Se algum tiver sucesso → compra aprovada 
+ 5. Caso todos falhem → erro retornado
+ 
+ ---
 
-Tenta gateway 1
-
-Se falhar → tenta gateway 2
-
-Se algum tiver sucesso → compra aprovada
-
-Caso todos falhem → erro retornado
-
----
-
-# Testes de gateway
-
-CVVs simulam cenários:
-
-| CVV	|Resultado
-|-----|--------------------------------------
-| 010	|sucesso no gateway 1
-| 100	|erro no gateway 1 → sucesso gateway 2
-| 200	|erro em ambos gateways
-
----
-
-# Testando a API
-
-Após iniciar o projeto, utilize ferramentas como:
-
-Thunder Client
-
-Postman
-
-Insomnia
-
-para testar as rotas documentadas neste README.
-
----
+ # Testes de gateway 
+ 
+ CVVs simulam cenários: 
+ | CVV | Resultado | 
+ |----|----------
+ | 010 | sucesso no gateway 1 
+ | 100 | erro no gateway 1 → sucesso gateway 2
+ | 200 | erro em ambos gateways | 
+ 
+ ---
 
 # Observações
 
