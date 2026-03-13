@@ -313,7 +313,7 @@ Body:
  CVVs simulam cenários: 
  ```text
  | CVV | Resultado                            | 
- |-----|---------------------------------------
+ |-----|--------------------------------------|
  | 010 | sucesso no gateway 1                 |
  | 100 | erro no gateway 1 → sucesso gateway 2|
  | 200 | erro em ambos gateways               | 
