@@ -377,24 +377,23 @@ Body:
 
 ---
 
-# Fluxo de fallback de gateways
+## Fluxo de fallback de gateways
 
- 1. Busca gateways ativos ordenados por prioridade 
- 2. Tenta gateway 1
- 3. Se falhar → tenta gateway 2
- 4. Se algum tiver sucesso → compra aprovada 
- 5. Caso todos falhem → erro retornado
+1. Busca gateways ativos ordenados por prioridade  
+2. Tenta gateway 1  
+3. Se falhar → tenta gateway 2  
+4. Se algum tiver sucesso → compra aprovada  
+5. Caso todos falhem → erro retornado
  
  ---
 
  # Testes de gateway 
  
- CVVs simulam cenários: 
- | CVV | Resultado | 
- |----|----------
- | 010 | sucesso no gateway 1 
- | 100 | erro no gateway 1 → sucesso gateway 2
- | 200 | erro em ambos gateways | 
+| CVV | Resultado |
+|-----|-----------|
+| 010 | sucesso no gateway 1 |
+| 100 | erro no gateway 1 → sucesso gateway 2 |
+| 200 | erro em ambos gateways |
  
  ---
 
