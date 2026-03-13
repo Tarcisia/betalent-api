@@ -41,12 +41,13 @@ A aplicação foi estruturada seguindo boas práticas de separação de responsa
 
 
 app/
-Controllers → controle das rotas da API
-Services → regras de negócio
-Gateways → integração com APIs externas
-Models → entidades do sistema
-Requests → validação de dados
-Resources → formatação das respostas
+ ├── Http/Controllers → controle das rotas da API
+ ├── Services → regras de negócio
+ │     └── Payment → lógica de pagamento e orquestração
+ │          └── Gateways → integração com APIs externas
+ ├── Models → entidades do sistema
+ ├── Http/Requests → validação de dados
+ └── Http/Resources → formatação das respostas
 
 
 A lógica de pagamento utiliza um **orquestrador de gateways**, que tenta processar a cobrança respeitando a prioridade definida.
@@ -161,7 +162,7 @@ Depois configure as credenciais do banco no `.env`.
 ## Execução com Docker
 
 
-cp .env.docker .env
+cp .env.example .env
 docker compose up --build
 
 
@@ -260,7 +261,12 @@ http://localhost:8000
 
 # Gateways de pagamento
 
-Para testes, foram utilizados **mocks de gateways**.
+O projeto suporta integração com múltiplos gateways de pagamento.
+
+Para facilitar a execução do teste, foram utilizados **mocks de gateways**, conforme descrito no desafio.
+
+Esses mocks simulam diferentes cenários de resposta e permitem validar o mecanismo de fallback entre gateways.
+
 
 Gateway 1
 
@@ -290,7 +296,7 @@ Se o primeiro falhar, o segundo é utilizado automaticamente.
 ### Login
 
 
-POST /api/auth/login
+ POST /api/auth/login
 
 
 ---
@@ -368,3 +374,38 @@ Body:
     "cvv": "010"
   }
 }
+
+---
+
+# Fluxo de fallback de gateways
+
+ 1. Busca gateways ativos ordenados por prioridade 
+ 2. Tenta gateway 1
+ 3. Se falhar → tenta gateway 2
+ 4. Se algum tiver sucesso → compra aprovada 
+ 5. Caso todos falhem → erro retornado
+ 
+ ---
+
+ # Testes de gateway 
+ 
+ CVVs simulam cenários: 
+ | CVV | Resultado | 
+ |----|----------
+ | 010 | sucesso no gateway 1 
+ | 100 | erro no gateway 1 → sucesso gateway 2
+ | 200 | erro em ambos gateways | 
+ 
+ ---
+
+# Observações
+
+O projeto possui configuração para execução utilizando Docker e Docker Compose.
+
+Caso o ambiente local não possua Docker configurado, a aplicação também pode ser executada utilizando PHP e MySQL instalados diretamente na máquina, seguindo os passos descritos na seção "Execução local".
+
+Os gateways de pagamento utilizados no teste são mocks disponibilizados no enunciado do desafio.
+
+# Autor
+
+Tarcisia Solange Dias Luciano
