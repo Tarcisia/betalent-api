@@ -39,7 +39,7 @@ A API permite:
 
 A aplicação foi estruturada seguindo boas práticas de separação de responsabilidades.
 
-
+```text
 app/
  ├── Http/Controllers → controle das rotas da API
  ├── Services → regras de negócio
@@ -49,19 +49,17 @@ app/
  ├── Http/Requests → validação de dados
  └── Http/Resources → formatação das respostas
 
-
+```
 A lógica de pagamento utiliza um **orquestrador de gateways**, que tenta processar a cobrança respeitando a prioridade definida.
 
 Fluxo:
 
+```text
+API → PaymentOrchestrator → Gateway 1
+                         ↳ falha → Gateway 2
+                         ↳ sucesso → transação registrada
 
-API → PaymentOrchestrator → Gateway1
-↓ erro
-Gateway2
-↓ sucesso
-Transação registrada
-
-
+```
 ---
 
 # Banco de Dados
