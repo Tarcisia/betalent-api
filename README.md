@@ -40,7 +40,7 @@ A API permite:
 
 A aplicação foi estruturada seguindo boas práticas de separação de responsabilidades.
 
-
+'''text
 app/
  ├── Http/Controllers → controle das rotas da API
  ├── Services → regras de negócio
@@ -49,19 +49,17 @@ app/
  ├── Models → entidades do sistema
  ├── Http/Requests → validação de dados
  └── Http/Resources → formatação das respostas
-
+'''
 
 A lógica de pagamento utiliza um **orquestrador de gateways**, que tenta processar a cobrança respeitando a prioridade definida.
 
 Fluxo:
 
-
-API → PaymentOrchestrator → Gateway1
-↓ erro
-Gateway2
-↓ sucesso
+'''text
+API → PaymentOrchestrator → Gateway1 ↓ erro
+Gateway2 ↓ sucesso
 Transação registrada
-
+'''
 
 ---
 
@@ -311,12 +309,14 @@ Body:
  # Testes de gateway 
  
  CVVs simulam cenários: 
- | CVV | Resultado | 
- |----|----------
- | 010 | sucesso no gateway 1 
- | 100 | erro no gateway 1 → sucesso gateway 2
- | 200 | erro em ambos gateways | 
- 
+ '''text
+ | CVV | Resultado                            | 
+ |-----|---------------------------------------
+ | 010 | sucesso no gateway 1                 |
+ | 100 | erro no gateway 1 → sucesso gateway 2|
+ | 200 | erro em ambos gateways               | 
+ '''
+
  ---
 
 # Observações
