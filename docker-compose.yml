@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: betalant_api
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/var/www
+    depends_on:
+      - mysql
+    networks:
+      - betalant-network
+
+  mysql:
+    image: mysql:8
+    container_name: betalant_mysql
+    restart: always
+    environment:
+      MYSQL_DATABASE: betalent
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "3306:3306"
+    networks:
+      - betalant-network
+
+  gateways:
+    image: matheusprotzen/gateways-mock
+    container_name: betalant_gateways
+    ports:
+      - "3001:3001"
+      - "3002:3002"
+    networks:
+      - betalant-network
+
+networks:
+  betalant-network:
