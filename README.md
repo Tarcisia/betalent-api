@@ -23,6 +23,7 @@ A API permite:
 
 - Autenticação de usuários
 - Controle de acesso por **roles**
+- CRUD de usuários
 - CRUD de produtos
 - Registro de clientes
 - Criação de compras
@@ -39,28 +40,33 @@ A API permite:
 
 A aplicação foi estruturada seguindo boas práticas de separação de responsabilidades.
 
+---
 
+## Estrutura principal
+
+```text
 app/
- ├── Http/Controllers → controle das rotas da API
- ├── Services → regras de negócio
- │     └── Payment → lógica de pagamento e orquestração
- │          └── Gateways → integração com APIs externas
- ├── Models → entidades do sistema
- ├── Http/Requests → validação de dados
- └── Http/Resources → formatação das respostas
+├── Http/
+│ ├── Controllers → controle das rotas da API
+│ ├── Requests → validação de dados
+│ └── Resources → formatação das respostas
+├── Models → entidades do sistema
+└── Services
+├── Payment → lógica de pagamento e orquestração
+└── Payment/Gateways → integração com APIs externas
+```
 
+---
+
+## Fluxo de pagamento
 
 A lógica de pagamento utiliza um **orquestrador de gateways**, que tenta processar a cobrança respeitando a prioridade definida.
 
-Fluxo:
-
-
-API → PaymentOrchestrator → Gateway1
-↓ erro
-Gateway2
-↓ sucesso
-Transação registrada
-
+```text
+API → PaymentOrchestrator → Gateway 1
+↳ falha → Gateway 2
+↳ sucesso → transação registrada
+```
 
 ---
 
@@ -75,14 +81,12 @@ email | email do usuário |
 password | senha |
 role | perfil do usuário |
 
-Roles disponíveis:
-
+## Roles disponíveis:
 
 ADMIN
 MANAGER
 FINANCE
 USER
-
 
 ---
 
@@ -143,64 +147,38 @@ total_amount | valor total |
 
 # Como executar o projeto
 
-Existem duas formas de executar a aplicação.
+Existem duas formas de executar a aplicação:
 
----
-
-# Configuração de ambiente
-
-O projeto possui dois ambientes possíveis.
-
-## Execução local
-
-
-cp .env.example .env
-
-
-Depois configure as credenciais do banco no `.env`.
-
-## Execução com Docker
-
-
-cp .env.example .env
-docker compose up --build
-
+1. Execução local (PHP + MySQL)
+2. Execução com Docker
 
 ---
 
 # 1️⃣ Execução local
 
-### Requisitos
+## Requisitos
 
 - PHP 8.2+
 - Composer
 - MySQL
 
----
+## Passos
 
-### Passos
+### Clone o repositório:
 
-Clone o projeto
-
-
-git clone <repo>
+```bash
+git clone https://github.com/Tarcisia/betalent-api.git
 cd betalent-api
-
-
-Instale dependências
-
+```
+### Instale as dependências:
 
 composer install
 
-
-Configure o `.env`
-
+### Configure o arquivo .env:
 
 cp .env.example .env
 
-
-Configure o banco
-
+### Configure as credenciais do banco no .env:
 
 DB_CONNECTION=mysql
 DB_HOST=127.0.0.1
@@ -209,22 +187,16 @@ DB_DATABASE=betalent
 DB_USERNAME=root
 DB_PASSWORD=SEU_PASSWORD
 
-
-Execute migrations
-
+### Execute migrations e seeds:
 
 php artisan migrate
 php artisan db:seed
 
-
-Inicie o servidor
-
+### Inicie o servidor:
 
 php artisan serve
 
-
-API disponível em:
-
+### A API estará disponível em:
 
 http://127.0.0.1:8000
 
@@ -233,131 +205,85 @@ http://127.0.0.1:8000
 
 # 2️⃣ Execução com Docker
 
-### Requisitos
+## Requisitos
 
-- Docker
-- Docker Compose
+Docker
 
-Execute:
+Docker Compose
 
+## Passos
+
+### Configure o ambiente:
+
+cp .env.example .env
+
+### Suba os containers:
 
 docker compose up --build
 
-
-Após subir os containers execute:
-
+### Execute migrations e seeds:
 
 docker exec -it betalant_api php artisan migrate
 docker exec -it betalant_api php artisan db:seed
 
-
-API disponível em:
-
+### A API estará disponível em:
 
 http://localhost:8000
 
 
 ---
 
-# Gateways de pagamento
+# Autenticação
 
-O projeto suporta integração com múltiplos gateways de pagamento.
+A API utiliza Laravel Sanctum.
 
-Para facilitar a execução do teste, foram utilizados **mocks de gateways**, conforme descrito no desafio.
+Após o login, um token será retornado e deverá ser enviado no header das requisições protegidas:
 
-Esses mocks simulam diferentes cenários de resposta e permitem validar o mecanismo de fallback entre gateways.
-
-
-Gateway 1
-
-
-POST /login
-POST /transactions
-POST /transactions/:id/charge_back
-
-
-Gateway 2
-
-
-POST /transacoes
-POST /transacoes/reembolso
-
-
-O sistema tenta processar a compra respeitando a **prioridade dos gateways**.
-
-Se o primeiro falhar, o segundo é utilizado automaticamente.
+Authorization: Bearer {token}
 
 ---
 
 # Rotas principais da API
 
-## Autenticação
+## Login
 
-### Login
+POST /api/auth/login
 
+## Usuários
+GET /api/users
+POST /api/users
+PUT /api/users/{id}
+DELETE /api/users/{id}
 
- POST /api/auth/login
-
-
----
-
-# Produtos
-
-
+## Produtos
 GET /api/products
 POST /api/products
 PUT /api/products/{id}
 DELETE /api/products/{id}
 
-
----
-
-# Compras
-
-
+## Compras
 POST /api/purchases
 GET /api/transactions
 GET /api/transactions/{id}
 
-
----
-
-# Reembolso
-
-
+## Reembolso
 POST /api/transactions/{id}/refund
 
-
----
-
-# Clientes
-
-
+## Clientes
 GET /api/clients
 GET /api/clients/{id}
 
-
----
-
-# Gateways
-
-
+## Gateways
 GET /api/gateways
 PATCH /api/gateways/{id}/toggle
 PATCH /api/gateways/{id}/priority
 
-
----
-
-# Exemplo de compra
-
-
+## Exemplo de compra
 POST /api/purchases
-
 
 Body:
 
-```json
+'''json
 {
   "client": {
     "name": "Tarcisia Luciano",
@@ -374,37 +300,59 @@ Body:
     "cvv": "010"
   }
 }
+'''
 
 ---
 
 # Fluxo de fallback de gateways
 
- 1. Busca gateways ativos ordenados por prioridade 
- 2. Tenta gateway 1
- 3. Se falhar → tenta gateway 2
- 4. Se algum tiver sucesso → compra aprovada 
- 5. Caso todos falhem → erro retornado
- 
- ---
+Busca gateways ativos ordenados por prioridade
 
- # Testes de gateway 
- 
- CVVs simulam cenários: 
- | CVV | Resultado | 
- |----|----------
- | 010 | sucesso no gateway 1 
- | 100 | erro no gateway 1 → sucesso gateway 2
- | 200 | erro em ambos gateways | 
- 
- ---
+Tenta gateway 1
+
+Se falhar → tenta gateway 2
+
+Se algum tiver sucesso → compra aprovada
+
+Caso todos falhem → erro retornado
+
+---
+
+# Testes de gateway
+
+CVVs simulam cenários:
+
+| CVV	|Resultado
+|-----|--------------------------------------
+| 010	|sucesso no gateway 1
+| 100	|erro no gateway 1 → sucesso gateway 2
+| 200	|erro em ambos gateways
+
+---
+
+# Testando a API
+
+Após iniciar o projeto, utilize ferramentas como:
+
+Thunder Client
+
+Postman
+
+Insomnia
+
+para testar as rotas documentadas neste README.
+
+---
 
 # Observações
 
 O projeto possui configuração para execução utilizando Docker e Docker Compose.
 
-Caso o ambiente local não possua Docker configurado, a aplicação também pode ser executada utilizando PHP e MySQL instalados diretamente na máquina, seguindo os passos descritos na seção "Execução local".
+Caso o ambiente local não possua Docker configurado, a aplicação também pode ser executada utilizando PHP e MySQL instalados diretamente na máquina.
 
-Os gateways de pagamento utilizados no teste são mocks disponibilizados no enunciado do desafio.
+Os gateways utilizados no teste são mocks disponibilizados no enunciado do desafio.
+
+---
 
 # Autor
 
