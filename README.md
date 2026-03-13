@@ -374,7 +374,7 @@ Body:
     "cvv": "010"
   }
 }
-
+```
 ---
 
 ## Fluxo de fallback de gateways
