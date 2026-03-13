@@ -40,7 +40,7 @@ A API permite:
 
 A aplicação foi estruturada seguindo boas práticas de separação de responsabilidades.
 
-'''text
+```text
 app/
  ├── Http/Controllers → controle das rotas da API
  ├── Services → regras de negócio
@@ -49,17 +49,17 @@ app/
  ├── Models → entidades do sistema
  ├── Http/Requests → validação de dados
  └── Http/Resources → formatação das respostas
-'''
+```
 
 A lógica de pagamento utiliza um **orquestrador de gateways**, que tenta processar a cobrança respeitando a prioridade definida.
 
 Fluxo:
 
-'''text
-API → PaymentOrchestrator → Gateway1 ↓ erro
-Gateway2 ↓ sucesso
-Transação registrada
-'''
+```text
+API → PaymentOrchestrator → Gateway 1
+↳ falha → Gateway 2
+↳ sucesso → transação registrada
+```
 
 ---
 
@@ -75,12 +75,12 @@ password | senha |
 role | perfil do usuário |
 
 ## Roles disponíveis:
-
+```text
 ADMIN
 MANAGER
 FINANCE
 USER
-
+```
 ---
 
 ## gateways
@@ -163,6 +163,7 @@ Existem duas formas de executar a aplicação:
 git clone https://github.com/Tarcisia/betalent-api.git
 cd betalent-api
 ```
+
 ### Instale as dependências:
 
 composer install
@@ -276,7 +277,7 @@ POST /api/purchases
 
 Body:
 
-'''json
+```json
 {
   "client": {
     "name": "Tarcisia Luciano",
@@ -293,6 +294,7 @@ Body:
     "cvv": "010"
   }
 }
+```
 
 ---
 
@@ -309,13 +311,13 @@ Body:
  # Testes de gateway 
  
  CVVs simulam cenários: 
- '''text
+ ```text
  | CVV | Resultado                            | 
  |-----|---------------------------------------
  | 010 | sucesso no gateway 1                 |
  | 100 | erro no gateway 1 → sucesso gateway 2|
  | 200 | erro em ambos gateways               | 
- '''
+ ```
 
  ---
 
